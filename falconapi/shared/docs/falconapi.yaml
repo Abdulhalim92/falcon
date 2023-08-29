@@ -1,0 +1,173 @@
+openapi: 3.0.0
+info:
+  title: Сервис админки falconapi
+  version: 0.0.1
+servers:
+  - url: http://localhost:3005/api/v1
+    description: Dev server
+paths:
+  /login:
+    post:
+      summary: Метод входа пользователя
+      tags:
+        - Auth
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginUser"
+      responses:
+        '200':
+          description: Успешный вход первого фактора
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseLogin"
+        '400':
+          description: Ошибка со стороны клиента
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '500':
+          description: Ошибка со стороны сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /generate-otp:
+    post:
+      summary: Генерация OTP
+      tags:
+        - Auth
+      operationId: generateOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OtpGenerate"
+      responses:
+        '200':
+          description: Успешная генерация OTP
+          content:
+            application/octet-stream:
+              schema:
+                $ref: "#/components/schemas/OtpBytes"
+        '400':
+          description: Ошибка со стороны клиента
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '500':
+          description: Ошибка со стороны сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /validate-otp:
+    post:
+      summary: Валидация OTP
+      tags:
+        - Auth
+      operationId: validateOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OtpValidate"
+      responses:
+        '200':
+          description: Успешная вход второго фактора
+          content:
+            application/octet-stream:
+              schema:
+                $ref: "#/components/schemas/ResponseLogin"
+        '400':
+          description: Ошибка со стороны клиента
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '500':
+          description: Ошибка со стороны сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+
+components:
+  schemas:
+    LoginUser:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: bahrom
+        password:
+          type: string
+          example: password
+      description: Данные входа пользователя
+
+    ResponseLogin:
+      type: object
+      required:
+        - message
+        - otp_generated
+        - user_id
+      properties:
+        message:
+          type: string
+          example: please validate OTP
+        otp_generated:
+          type: boolean
+          example: false
+        user_id:
+          type: string
+          example: c45e5eb8-e44d-4015-8460-063511d1530a
+
+    OtpGenerate:
+      type: object
+      properties:
+        user_id:
+          type: string
+          example: c45e5eb8-e44d-4015-8460-063511d1530a
+
+    OtpValidate:
+      type: object
+      properties:
+        user_id:
+          type: string
+          example: c45e5eb8-e44d-4015-8460-063511d1530a
+        otp_token:
+          type: string
+          example: "123456"
+        username:
+          type: string
+          example: murodali
+        password:
+          type: string
+          example: password
+
+    OtpBytes:
+      type: string
+      format: byte
+
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string

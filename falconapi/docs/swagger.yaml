@@ -1,0 +1,324 @@
+basePath: /api/v1
+definitions:
+  entities.TRegion:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  entities.TerminalStatus:
+    properties:
+      address:
+        type: string
+      detailStatus:
+        type: string
+      endpointDisabled:
+        type: boolean
+      endpointID:
+        type: integer
+      endpointNum:
+        type: integer
+      lastPayment:
+        type: string
+      lastPaymentDetail:
+        type: string
+      lastPing:
+        type: string
+      phone:
+        type: string
+      region_id:
+        type: integer
+      regionName:
+        type: string
+      status:
+        type: string
+    type: object
+  usermgmtuc.GenerateOtpRequest:
+    properties:
+      user_id:
+        type: string
+    type: object
+  usermgmtuc.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        maxLength: 15
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  usermgmtuc.LoginResponse:
+    properties:
+      message:
+        type: string
+      otpGenerated:
+        type: boolean
+      userID:
+        type: string
+    type: object
+  usermgmtuc.RegisterRequest:
+    properties:
+      email:
+        type: string
+      firstName:
+        maxLength: 30
+        minLength: 1
+        type: string
+      lastName:
+        maxLength: 30
+        minLength: 1
+        type: string
+      mobileNumber:
+        type: string
+      password:
+        type: string
+      username:
+        maxLength: 15
+        minLength: 3
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  usermgmtuc.ValidateOtpRequest:
+    properties:
+      otp_token:
+        type: string
+      password:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+  usermgmtuc.ValidateOtpResponse:
+    properties:
+      access_token:
+        description: QrCode       bytes.Buffer `json:"qr_code,omitempty"`
+        type: string
+      message:
+        type: string
+      refresh_token:
+        type: string
+      user_id:
+        type: string
+    type: object
+host: 192.168.100.155:3006
+info:
+  contact: {}
+  description: FalconApi
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Сервис админки FalconApi
+  version: "1.0"
+paths:
+  /generate-otp:
+    post:
+      consumes:
+      - application/json
+      description: Генерация OTP
+      parameters:
+      - description: Generate OTP data
+        in: body
+        name: GenerateOtp
+        required: true
+        schema:
+          $ref: '#/definitions/usermgmtuc.GenerateOtpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: PNG image data
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Метод генарации OTP
+      tags:
+      - Auth
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Вход пользователя под логином и паролем
+      parameters:
+      - description: Login data
+        in: body
+        name: LoginInput
+        required: true
+        schema:
+          $ref: '#/definitions/usermgmtuc.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/usermgmtuc.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Метод входа пользователя
+      tags:
+      - Auth
+  /region:
+    get:
+      consumes:
+      - application/json
+      description: Получение списка регионов
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/entities.TRegion'
+              type: array
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Метод получения списка регионов
+      tags:
+      - Terminals
+  /terminalsinfo:
+    get:
+      consumes:
+      - application/json
+      description: Получение инфо - статусов терминалов
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/entities.TerminalStatus'
+              type: array
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Метод получения инфо - статусов терминалов
+      tags:
+      - Terminals
+  /terminalstatuses:
+    get:
+      consumes:
+      - application/json
+      description: Получение статусов терминалов
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/entities.TerminalStatus'
+              type: array
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Метод получения статусов терминалов
+      tags:
+      - Terminals
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация пользователя
+      parameters:
+      - description: Login data
+        in: body
+        name: RegisterInput
+        required: true
+        schema:
+          $ref: '#/definitions/usermgmtuc.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Метод регистрации пользователя
+      tags:
+      - Auth
+  /validate-otp:
+    post:
+      consumes:
+      - application/json
+      description: Валидация OTP
+      parameters:
+      - description: Validate OTP data
+        in: body
+        name: ValidateOtp
+        required: true
+        schema:
+          $ref: '#/definitions/usermgmtuc.ValidateOtpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/usermgmtuc.ValidateOtpResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Метод валидации OTP
+      tags:
+      - Auth
+schemes:
+- http
+swagger: "2.0"
